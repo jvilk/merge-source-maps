@@ -1,0 +1,22 @@
+{
+  "name": "grunt-merge-source-maps",
+  "version": "0.1.0",
+  "description": "Grunt task for merging multiple source maps into a single source map.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvilk/grunt-merge-source-maps.git"
+  },
+  "author": {
+    "email": "jvilk@cs.umass.edu",
+    "name": "John Vilk"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jvilk/grunt-merge-source-maps/issues"
+  },
+  "homepage": "https://github.com/jvilk/grunt-merge-source-maps#readme",
+  "dependencies": {
+    "source-map": "^0.5.1",
+    "underscore": "^1.8.3"
+  }
+}
