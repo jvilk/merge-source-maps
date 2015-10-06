@@ -4,6 +4,7 @@
         "noImplicitAny": true
     },
     "files": [
-        "tasks/merge.ts"
+        "tasks/merge.ts",
+        "tasks/lib/SourceMapUtils.ts"
     ]
 }

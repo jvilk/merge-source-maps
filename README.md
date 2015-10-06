@@ -25,24 +25,20 @@ Task targets, files and options may be specified according to the grunt [Configu
 
 ### Source Files
 
-The source files for this task can be any combination of the following:
-
-* JavaScript source referring to an external source map.
-* JavaScript source with an embedded source map.
-* A source map.
-
-Regardless of which type, each source file must be from the *final* step in the compilation process.
+The source files for this task should be a JavaScript source file that contains or references an external source map.
+The source file should be from the *final* step in the compilation process.
 `grunt-merge-source-maps` will follow the chain of source maps to the beginning.
 
 For example, let's say that you compiled `foo.ts` to `foo.js`, and minified it to `foo.min.js`.
-If you want to combine `foo.js.map` and `foo.min.js.map`, you should specify either `foo.min.js.map` or `foo.min.js`.
+If you want to combine `foo.js.map` and `foo.min.js.map`, you should specify `foo.min.js`.
 
 ### Destination File
 
-The corresponding destination file *must* be the source map file name that you desire.
-However, if you specified `inlineSourceMap`, then the destination *must* be the JavaScript file that you wish to inline the source map into.
+By default, `merge-source-maps` will overwrite the source map from the final compilation phase.
+If you switch from an inlined source map to an external source map, it will write to `[filename].map` instead.
 
-If you do not specify a destination, `merge-source-maps` will default to `[source file].map` or `[source file]`, depending on your configuration.
+If specified, the corresponding destination file *must* be the source map file name that you desire.
+However, if you specified `inlineSourceMap`, then `merge-source-maps` will ignore the destination file and modify the final generated file instead.
 
 ### Options
 
@@ -90,8 +86,8 @@ Perfect for scenarios where bandwidth is not an issue, such as Node projects or 
         },
         files: [{
             // src and dest are the same; merge-source-maps appends source map info to target file
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js'
+            src: ['build/*.js'],
+            expand: true
         }]
     }
 }
@@ -110,8 +106,9 @@ Perfect for production web projects, where you want small, minified JavaScript f
             inlineSources: true
         },
         files: [{
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js.map'
+            // merge-source-maps will overwrite each file's source map.
+            src: ['build/*js'],
+            expand: true
         }]
     }
 }
@@ -130,8 +127,9 @@ Also ideal if your debugger does not support embedded source code in source maps
 "merge-source-maps": {
     foo: {
         files: [{
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js.map'
+            // merge-source-maps will overwrite each file's source map.
+            src: ['build/*.js'],
+            expand: true
         }]
     }
 }
@@ -156,3 +154,9 @@ Open an issue if this is a desired feature, and provide sample files if you can.
 source maps generated from multiple source files, which is intended to be useful when multiple JS files are concatenated.
 Currently, `merge-source-maps` does not support this field, and will throw an error.
 Feel free to open an issue if this limitation is inhibiting your use of `merge-source-maps`.
+
+## What about {gulp,jake,broccoli}?
+
+Do you use a different build system?
+Let me know if you're interested in spearheading development of a similar plugin for those environments.
+I can spin off `SourceMapUtils` (`tasks/lib/SourceMapUtils.ts`) into a separate module that your plugin can depend on, and that we can maintain together.
