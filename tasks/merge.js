@@ -78,6 +78,9 @@ module.exports = function (grunt) {
             var sourceMaps = [], nextPath = file.src[0], currentSourceMap = null;
             // Follow the source map back to its... source.
             while (null !== nextPath && null !== (currentSourceMap = getSourceMap(grunt, nextPath))) {
+                if (currentSourceMap.map.sections) {
+                    grunt.log.error("Source map for file " + file.src[0] + " contains the unsupported \"sections\" property.");
+                }
                 sourceMaps.push(currentSourceMap);
                 if (currentSourceMap.map['sources']) {
                     if (currentSourceMap.map.sources.length > 1) {
@@ -97,7 +100,6 @@ module.exports = function (grunt) {
                     if (mergedSourceMapObj.sourceRoot) {
                         sources = sources.map(function (source) { return path.relative(mergedSourceMapObj.sourceRoot, source); });
                     }
-                    // XXX: Invalid TS typings; PR in the works.
                     mergedSourceMapObj.sourcesContent = sources.map(function (source) { return fs.readFileSync(source).toString(); });
                     mergedSourceMap = JSON.stringify(mergedSourceMapObj);
                 }

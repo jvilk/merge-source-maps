@@ -122,8 +122,7 @@ export = function(grunt: IGrunt) {
             if (mergedSourceMapObj.sourceRoot) {
               sources = sources.map((source) => path.relative(mergedSourceMapObj.sourceRoot, source));
             }
-            // XXX: Invalid TS typings; PR in the works.
-            mergedSourceMapObj.sourcesContent = <any> sources.map((source) => fs.readFileSync(source).toString());
+            mergedSourceMapObj.sourcesContent = sources.map((source) => fs.readFileSync(source).toString());
             mergedSourceMap = JSON.stringify(mergedSourceMapObj);
           }
 
