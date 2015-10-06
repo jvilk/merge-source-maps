@@ -99,6 +99,9 @@ export = function(grunt: IGrunt) {
           currentSourceMap: ISourceMapInfo = null;
         // Follow the source map back to its... source.
         while (null !== nextPath && null !== (currentSourceMap = getSourceMap(grunt, nextPath))) {
+          if ((<any> currentSourceMap.map).sections) {
+            grunt.log.error(`Source map for file ${file.src[0]} contains the unsupported "sections" property.`)
+          }
           sourceMaps.push(currentSourceMap);
           if (currentSourceMap.map['sources']) {
             if (currentSourceMap.map.sources.length > 1) {
