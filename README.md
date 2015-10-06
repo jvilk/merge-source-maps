@@ -81,17 +81,19 @@ Thus, the JavaScript file alone is all that is needed to debug your program with
 embedded source maps.
 Perfect for scenarios where bandwidth is not an issue, such as Node projects or debug builds.
 
-    "merge-source-maps": {
-        foo: {
-            options: {
-                inlineSourceMap: true,
-                inlineSources: true
-            },
-            // src and dest are the same; merge-source-maps appends source map info to target file
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js'
-        }
+```js
+"merge-source-maps": {
+    foo: {
+        options: {
+            inlineSourceMap: true,
+            inlineSources: true
+        },
+        // src and dest are the same; merge-source-maps appends source map info to target file
+        src: 'build/<%= basename %>.js',
+        dest: 'build/<%= basename %>.js'
     }
+}
+```
 
 ### External source maps with inlined sources
 
@@ -99,15 +101,17 @@ With this setup, the generated JavaScript file will have a corresponding `.map` 
 The debugger will only need the JavaScript file and the map file to debug the code with source maps.
 Perfect for production web projects, where you want small, minified JavaScript files but also want to be able to debug the original source code.
 
-    "merge-source-maps": {
-        foo: {
-            options: {
-                inlineSources: true
-            },
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js.map'
-        }
+```js
+"merge-source-maps": {
+    foo: {
+        options: {
+            inlineSources: true
+        },
+        src: 'build/<%= basename %>.js',
+        dest: 'build/<%= basename %>.js.map'
     }
+}
+```
 
 ### External source maps with external sources
 
@@ -118,12 +122,14 @@ Ideal if you are already planning on hosting the original source files for some 
 embedded within the source map.
 Also ideal if your debugger does not support embedded source code in source maps.
 
-    "merge-source-maps": {
-        foo: {
-            src: 'build/<%= basename %>.js',
-            dest: 'build/<%= basename %>.js.map'
-        }
+```js
+"merge-source-maps": {
+    foo: {
+        src: 'build/<%= basename %>.js',
+        dest: 'build/<%= basename %>.js.map'
     }
+}
+```
 
 ## Caveats and Limitations
 
