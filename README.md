@@ -88,9 +88,11 @@ Perfect for scenarios where bandwidth is not an issue, such as Node projects or 
             inlineSourceMap: true,
             inlineSources: true
         },
-        // src and dest are the same; merge-source-maps appends source map info to target file
-        src: 'build/<%= basename %>.js',
-        dest: 'build/<%= basename %>.js'
+        files: [{
+            // src and dest are the same; merge-source-maps appends source map info to target file
+            src: 'build/<%= basename %>.js',
+            dest: 'build/<%= basename %>.js'
+        }]
     }
 }
 ```
@@ -107,8 +109,10 @@ Perfect for production web projects, where you want small, minified JavaScript f
         options: {
             inlineSources: true
         },
-        src: 'build/<%= basename %>.js',
-        dest: 'build/<%= basename %>.js.map'
+        files: [{
+            src: 'build/<%= basename %>.js',
+            dest: 'build/<%= basename %>.js.map'
+        }]
     }
 }
 ```
@@ -125,8 +129,10 @@ Also ideal if your debugger does not support embedded source code in source maps
 ```js
 "merge-source-maps": {
     foo: {
-        src: 'build/<%= basename %>.js',
-        dest: 'build/<%= basename %>.js.map'
+        files: [{
+            src: 'build/<%= basename %>.js',
+            dest: 'build/<%= basename %>.js.map'
+        }]
     }
 }
 ```
