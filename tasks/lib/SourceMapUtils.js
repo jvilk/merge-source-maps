@@ -1,6 +1,3 @@
-/// <reference path="../../typings/node/node.d.ts" />
-/// <reference path="../../typings/source-map/source-map.d.ts" />
-/// <reference path="../../typings/underscore/underscore.d.ts" />
 var fs = require('fs');
 var path = require('path');
 var SourceMapMerger = require('./SourceMapMerger.js'), mappingUrlPrefix = "# sourceMappingURL=", dataURLPrefix = "data:application/json;base64,";

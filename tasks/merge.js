@@ -1,7 +1,3 @@
-/// <reference path="../typings/node/node.d.ts" />
-/// <reference path="../typings/gruntjs/gruntjs.d.ts" />
-/// <reference path="../typings/source-map/source-map.d.ts" />
-/// <reference path="../typings/underscore/underscore.d.ts" />
 var path = require('path');
 var _ = require('underscore');
 var SourceMapUtils = require('./lib/SourceMapUtils');

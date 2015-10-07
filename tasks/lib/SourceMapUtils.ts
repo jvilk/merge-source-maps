@@ -1,6 +1,3 @@
-/// <reference path="../../typings/node/node.d.ts" />
-/// <reference path="../../typings/source-map/source-map.d.ts" />
-/// <reference path="../../typings/underscore/underscore.d.ts" />
 import fs = require('fs');
 import path = require('path');
 var SourceMapMerger: {

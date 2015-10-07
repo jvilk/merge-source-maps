@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/jvilk/grunt-merge-source-maps.git"
   },
+  "scripts": {
+    "prepublish": "node prepublish.js"
+  },
   "author": {
     "email": "jvilk@cs.umass.edu",
     "name": "John Vilk"
@@ -18,5 +21,9 @@
   "dependencies": {
     "source-map": "^0.5.1",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "tsd": "^0.6.5",
+    "typescript": "^1.6.2"
   }
 }

@@ -1,7 +1,3 @@
-/// <reference path="../typings/node/node.d.ts" />
-/// <reference path="../typings/gruntjs/gruntjs.d.ts" />
-/// <reference path="../typings/source-map/source-map.d.ts" />
-/// <reference path="../typings/underscore/underscore.d.ts" />
 import path = require('path');
 import fs = require('fs');
 import _ = require('underscore');
