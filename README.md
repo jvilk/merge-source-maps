@@ -81,6 +81,8 @@ Thus, the JavaScript file alone is all that is needed to debug your program with
 embedded source maps.
 Perfect for scenarios where bandwidth is not an issue, such as Node projects or debug builds.
 
+Grunt configuration:
+
 ```js
 "merge-source-maps": {
     foo: {
@@ -109,6 +111,8 @@ With this setup, the generated JavaScript file will have a corresponding `.map` 
 The debugger will only need the JavaScript file and the map file to debug the code with source maps.
 Perfect for production web projects, where you want small, minified JavaScript files but also want to be able to debug the original source code.
 
+Grunt configuration:
+
 ```js
 "merge-source-maps": {
     foo: {
@@ -124,6 +128,8 @@ Perfect for production web projects, where you want small, minified JavaScript f
 }
 ```
 
+On the command line:
+
 ```
 merge-source-maps --inline-sources build/*.js
 ```
@@ -137,6 +143,8 @@ Ideal if you are already planning on hosting the original source files for some 
 embedded within the source map.
 Also ideal if your debugger does not support embedded source code in source maps.
 
+Grunt configuration:
+
 ```js
 "merge-source-maps": {
     foo: {
@@ -148,6 +156,8 @@ Also ideal if your debugger does not support embedded source code in source maps
     }
 }
 ```
+
+On the command line:
 
 ```
 merge-source-maps build/*.js
