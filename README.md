@@ -183,6 +183,10 @@ source maps generated from multiple source files, which is intended to be useful
 Currently, `merge-source-maps` does not support this field, and will throw an error.
 Feel free to open an issue if this limitation is inhibiting your use of `merge-source-maps`.
 
+## Building
+
+To build `merge-source-maps` from source, simply run `npm install`.
+
 ## What about {gulp,jake,broccoli}?
 
 Do you use a different build system?

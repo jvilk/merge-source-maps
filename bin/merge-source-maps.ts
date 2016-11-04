@@ -24,7 +24,7 @@ const opts: ISourceMapMergerConfig = {
 };
 
 if (args._.length > 0) {
-  mergeSourceMaps.merge(args._, opts);
+  mergeSourceMaps.merge(args._.map((f: string) => { return { src: f, dest: f } }), opts);
 } else {
   parser.showHelp();
 }
