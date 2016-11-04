@@ -1,5 +1,5 @@
-# grunt-merge-source-maps v0.1.0
-> Grunt task for merging multiple source maps from compilation phases into a single source map.
+# merge-source-maps v0.5.0
+> Library, command-line tool, and Grunt task for merging multiple source maps from compilation phases into a single source map.
 
 If you have a multi-step compilation pipeline, you likely have a separate source map for each step
 of compilation (e.g. TypeScript => JavaScript => Minified JavaScript). Combining these source maps
@@ -9,30 +9,32 @@ is headache inducing, and there are currently no grunt tasks to do this for you.
 
 ## Getting Started
 
-Install the plugin with this command:
+Install with this command:
 
-    npm install grunt-merge-source-maps --save-dev
+    npm install merge-source-maps --save-dev
 
-Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
+Once installed, you can use `merge-source-maps` in your Gruntfile with this line of JavaScript:
 
-    grunt.loadNpmTasks('grunt-merge-source-maps');
+    grunt.loadNpmTasks('merge-source-maps');
 
-## `merge-source-maps` task
+Alternatively, you can use the `merge-source-maps` command line tool, which is now in `node_modules/.bin/merge-source-maps`.
+
+### Grunt `merge-source-maps` task
 
 *Run this task with `grunt merge-source-maps`.*
 
 Task targets, files and options may be specified according to the grunt [Configuring tasks](http://gruntjs.com/configuring-tasks) guide.
 
-### Source Files
+#### Source Files
 
 The source files for this task should be a JavaScript source file that contains or references an external source map.
 The source file should be from the *final* step in the compilation process.
-`grunt-merge-source-maps` will follow the chain of source maps to the beginning.
+`merge-source-maps` will follow the chain of source maps to the beginning.
 
 For example, let's say that you compiled `foo.ts` to `foo.js`, and minified it to `foo.min.js`.
 If you want to combine `foo.js.map` and `foo.min.js.map`, you should specify `foo.min.js`.
 
-### Destination File
+#### Destination File
 
 By default, `merge-source-maps` will overwrite the source map from the final compilation phase.
 If you switch from an inlined source map to an external source map, it will write to `[filename].map` instead.
@@ -40,9 +42,11 @@ If you switch from an inlined source map to an external source map, it will writ
 If specified, the corresponding destination file *must* be the source map file name that you desire.
 However, if you specified `inlineSourceMap`, then `merge-source-maps` will ignore the destination file and modify the final generated file instead.
 
-### Options
+## Options
 
-#### inlineSources
+These options are valid for the command line client, the library, and the Grunt task.
+
+### inlineSources (--inline-sources)
 
 Type: `Boolean`
 
@@ -50,7 +54,7 @@ Default: `false`
 
 If `true`, inlines the source code (from the first compilation step, e.g. TypeScript code) into the source map.
 
-#### inlineSourceMap
+### inlineSourceMap (--inline-source-map)
 
 Type: `Boolean`
 
@@ -58,19 +62,19 @@ Default: `false`
 
 If `true`, inlines the source map into the generated JavaScript. The `dest` file for each `src` file *must* be the path to the generated JavaScript.
 
-#### ignoreMissingSourceMaps
+### ignoreMissingSourceMaps (--ignore-missing-source-maps)
 
 Type: `Boolean`
 
 Default: `false`
 
-If `true`, ignores input files that are missing source maps. Otherwise, `grunt-merge-source-maps` will treat this event as a fatal error.
+If `true`, ignores input files that are missing source maps. Otherwise, `merge-source-maps` will treat this event as a fatal error.
 
-### Usage Examples
+## Usage Examples
 
 Below, we illustrate various useful configurations.
 
-#### Inlined source maps and sources
+### Inlined source maps and sources
 
 With this setup, the source map *and* the source code of your project will be embedded directly into the generated JavaScript file.
 Thus, the JavaScript file alone is all that is needed to debug your program with source maps, provided the debugger supports
@@ -91,6 +95,12 @@ Perfect for scenarios where bandwidth is not an issue, such as Node projects or 
         }]
     }
 }
+```
+
+On the command line:
+
+```
+merge-source-maps --inline-source-map --inline-sources build/*.js
 ```
 
 ### External source maps with inlined sources
@@ -114,6 +124,10 @@ Perfect for production web projects, where you want small, minified JavaScript f
 }
 ```
 
+```
+merge-source-maps --inline-sources build/*.js
+```
+
 ### External source maps with external sources
 
 With this setup, the generated JavaScript file will have a corresponding `.map` file that references external source code files.
@@ -133,6 +147,10 @@ Also ideal if your debugger does not support embedded source code in source maps
         }]
     }
 }
+```
+
+```
+merge-source-maps build/*.js
 ```
 
 ## Caveats and Limitations
@@ -158,5 +176,5 @@ Feel free to open an issue if this limitation is inhibiting your use of `merge-s
 ## What about {gulp,jake,broccoli}?
 
 Do you use a different build system?
-Let me know if you're interested in spearheading development of a similar plugin for those environments.
-I can spin off `SourceMapUtils` (`tasks/lib/SourceMapUtils.ts`) into a separate module that your plugin can depend on, and that we can maintain together.
+Let me know if you're interested in spearheading development of a similar plugin for those environments!
+I can either include it in this package, or you can make a package that depends on this one.

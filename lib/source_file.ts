@@ -1,12 +1,9 @@
 import fs = require('fs');
 import path = require('path');
-var SourceMapMerger: {
-  createMergedSourceMap(maps: SourceMap.RawSourceMap[], ignoreMissingStatements?: boolean): string;
-  createMergedSourceMapFromFiles(files: string[], ignoreMissingStatements?: boolean): string;
-} = require('./SourceMapMerger.js'),
-    mappingUrlPrefix = "# sourceMappingURL=",
-    dataURLPrefix = "data:application/json;base64,";
-
+import SourceMapModule = require("source-map");
+import Merger = require('./merge_utils');
+const mappingUrlPrefix = "# sourceMappingURL=";
+const dataURLPrefix = "data:application/json;base64,";
 
 /**
  * Represents a source file.
@@ -26,14 +23,14 @@ export class SourceFile {
     this._path = generatedFilePath;
     this._source = fs.readFileSync(generatedFilePath).toString();
 
-    var prefixIndex = this._source.indexOf(mappingUrlPrefix);
+    let prefixIndex = this._source.indexOf(mappingUrlPrefix);
     if (prefixIndex === -1) {
       // No source map.
       this._urlStart = -1;
     } else {
       this._urlStart = prefixIndex + mappingUrlPrefix.length;
 
-      var url = this._source.slice(this._urlStart).trim();
+      let url = this._source.slice(this._urlStart).trim();
       switch (url[0]) {
         case '"':
         case "'":
@@ -45,7 +42,7 @@ export class SourceFile {
   }
 
   private getMapFromUrl(url: string): SourceMap {
-    var mapPath: string = null, mapContents: string = null;
+    let mapPath: string = null, mapContents: string = null;
     if (url.slice(0, dataURLPrefix.length) === dataURLPrefix) {
       // Embedded source map.
       mapContents = new Buffer(url.slice(dataURLPrefix.length), 'base64').toString();
@@ -92,7 +89,7 @@ export class SourceMap {
   // The source map's corresponding file.
   private _file: SourceFile;
   // The raw JSON source map.
-  private _map: SourceMap.RawSourceMap;
+  private _map: SourceMapModule.RawSourceMap;
   // The path to the SourceMap.
   private _path: string;
   // The next file in the compilation chain.
@@ -134,7 +131,7 @@ export class SourceMap {
    * Retrieve an absolute path to the SourceMap's sourceRoot.
    */
   public getAbsoluteSourceRoot(): string {
-    var relativeSourceRoot = this._map['sourceRoot'] ? this._map.sourceRoot : '.';
+    let relativeSourceRoot = this._map['sourceRoot'] ? this._map.sourceRoot : '.';
     return this.resolveRelativePath(relativeSourceRoot);
   }
 
@@ -146,7 +143,7 @@ export class SourceMap {
     return this._path;
   }
 
-  protected getMap(): SourceMap.RawSourceMap {
+  protected getMap(): SourceMapModule.RawSourceMap {
     return this._map;
   }
 
@@ -163,13 +160,13 @@ export class SourceMap {
    * Merges all parents into this source map.
    */
   public merge(): void {
-    var nextMap = this,
-      maps: SourceMap.RawSourceMap[] = [];
+    let nextMap: SourceMap = this,
+      maps: SourceMapModule.RawSourceMap[] = [];
     while (nextMap !== null) {
       maps.push(nextMap.getMap())
       nextMap = nextMap.getParentMap();
     }
-    this._map = JSON.parse(SourceMapMerger.createMergedSourceMap(maps.reverse(), true));
+    this._map = JSON.parse(Merger.createMergedSourceMap(maps.reverse(), true));
     // Update SourceFiles.
     this._sourceFiles = this.getAbsoluteSourcePaths().map((sourcePath) => new SourceFile(sourcePath));
   }

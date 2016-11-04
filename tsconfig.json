@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true
     },
-    "files": [
-        "typings/tsd.d.ts",
-        "tasks/merge.ts",
-        "tasks/lib/SourceMapUtils.ts"
+    "include": [
+        "bin/**/*.ts", "lib/**/*.ts", "tasks/**/*.ts"
     ]
 }

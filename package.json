@@ -1,13 +1,16 @@
 {
-  "name": "grunt-merge-source-maps",
-  "version": "0.1.0",
-  "description": "Grunt task for merging multiple source maps into a single source map.",
+  "name": "merge-source-maps",
+  "version": "0.5.0",
+  "description": "Library, command-line tool, and Grunt task for merging multiple source maps from compilation phases into a single source map.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jvilk/grunt-merge-source-maps.git"
   },
+  "bin": {
+    "merge-source-maps": "./bin/merge-source-maps.js"
+  },
   "scripts": {
-    "prepublish": "node prepublish.js"
+    "prepublish": "tsc"
   },
   "author": {
     "email": "jvilk@cs.umass.edu",
@@ -19,11 +22,16 @@
   },
   "homepage": "https://github.com/jvilk/grunt-merge-source-maps#readme",
   "dependencies": {
-    "source-map": "^0.5.1",
-    "underscore": "^1.8.3"
+    "source-map": "^0.5.6",
+    "underscore": "^1.8.3",
+    "yargs": "^6.3.0"
   },
   "devDependencies": {
-    "tsd": "^0.6.5",
-    "typescript": "^1.6.2"
+    "@types/grunt": "^0.4.20",
+    "@types/node": "^6.0.46",
+    "@types/source-map": "^0.1.29",
+    "@types/underscore": "^1.7.33",
+    "@types/yargs": "^6.3.0",
+    "typescript": "^2.0.7"
   }
 }
