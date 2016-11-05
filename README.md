@@ -18,6 +18,17 @@ Once installed, you can use `merge-source-maps` in your Gruntfile with this line
     grunt.loadNpmTasks('merge-source-maps');
 
 Alternatively, you can use the `merge-source-maps` command line tool, which is now in `node_modules/.bin/merge-source-maps`.
+It's easy to call as a script in `package.json`:
+
+```json
+"scripts": {
+    "source-maps": "merge-source-maps --inline-sources dist/mylib.js"
+}
+```
+
+Or, install globally and you can run `merge-source-maps` from your terminal!
+
+    npm i -g merge-source-maps
 
 ### Grunt `merge-source-maps` task
 
