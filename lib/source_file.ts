@@ -1,7 +1,6 @@
 import fs = require('fs');
 import path = require('path');
 import SourceMapModule = require("source-map");
-import Merger = require('./merge_utils');
 const mappingUrlPrefix = "# sourceMappingURL=";
 const dataURLPrefix = "data:application/json;base64,";
 
@@ -52,7 +51,7 @@ export class SourceFile {
       mapPath = path.resolve(path.dirname(this._path), url);
       mapContents = fs.readFileSync(mapPath).toString();
     }
-    return new SourceMap(this, mapContents, mapPath);
+    return new SourceMap(this, JSON.parse(mapContents), mapPath);
   }
 
   public getPath(): string { return this._path; }
@@ -66,6 +65,18 @@ export class SourceFile {
 
   public getPathRelativeToFile(aPath: string): string {
     return path.relative(path.dirname(this._path), aPath);
+  }
+
+  public findOriginal(line: number, col: number, shouldIgnoreMissingRanges: boolean): SourceMapModule.MappedPosition {
+    if (this._map) {
+      return this._map.findOriginal(line, col, shouldIgnoreMissingRanges);
+    } else {
+      return {
+        line: line,
+        column: col,
+        source: this._path
+      };
+    }
   }
 
   /**
@@ -83,7 +94,6 @@ export class SourceFile {
 
 /**
  * Represents a SourceMap.
- * @param generatedFilePath The path to a generated JavaScript file that contains a sourceMappingURL.
  */
 export class SourceMap {
   // The source map's corresponding file.
@@ -92,15 +102,26 @@ export class SourceMap {
   private _map: SourceMapModule.RawSourceMap;
   // The path to the SourceMap.
   private _path: string;
-  // The next file in the compilation chain.
   private _sourceFiles: SourceFile[];
+  private _sourceFileMap: {[p: string]: SourceFile};
+  private _consumer: SourceMapModule.SourceMapConsumer;
 
-  constructor(file: SourceFile, rawContents: string, mapPath: string) {
+  constructor(file: SourceFile, map: SourceMapModule.RawSourceMap, mapPath: string) {
     this._file = file;
-    this._map = JSON.parse(rawContents);
     this._path = mapPath;
-    // Get the source files
-    this._sourceFiles = this.getAbsoluteSourcePaths().map((sourcePath) => new SourceFile(sourcePath));
+    this._updateMap(map);
+  }
+
+  private _updateMap(map: SourceMapModule.RawSourceMap): void {
+    this._map = map;
+    this._consumer = new SourceMapModule.SourceMapConsumer(map);
+    this._sourceFileMap = {};
+    this._sourceFiles = this.getAbsoluteSourcePaths().map((sourcePath) => {
+      const m = new SourceFile(sourcePath);
+      // Map relative path to sourcefile.
+      this._sourceFileMap[sourcePath] = m;
+      return m;
+    });
   }
 
   public getFile(): SourceFile {
@@ -127,6 +148,10 @@ export class SourceMap {
     return path.resolve(path.dirname(this._path), aPath);
   }
 
+  public getRelativePath(p: string): string {
+    return path.relative(path.dirname(this._path), p);
+  }
+
   /**
    * Retrieve an absolute path to the SourceMap's sourceRoot.
    */
@@ -147,28 +172,72 @@ export class SourceMap {
     return this._map;
   }
 
-  protected getParentMap(): SourceMap {
-    if (this._sourceFiles.length > 1) {
-      throw new Error(`Error: Source map for ${this._file.getPath()} has multiple source files.`);
-    } else if (this._sourceFiles.length === 0) {
+  protected getParentMaps(): SourceMap[] {
+    if (this._sourceFiles.length === 0) {
       return null;
     }
-    return this._sourceFiles[0].getMap();
+    return this._sourceFiles.map((f) => f.getMap());
+  }
+
+  public findOriginal(line: number, col: number, shouldIgnoreMissingRanges: boolean): SourceMapModule.MappedPosition {
+    const pos = this._consumer.originalPositionFor({ line: line, column: col });
+    if (!pos || pos.line === null || pos.line === undefined) {
+      if (shouldIgnoreMissingRanges) {
+        return pos;
+      } else {
+        throw new Error(`Could not find original location of ${this._file.getPath()}:${line}:${col}`);
+      }
+    }
+    // Normalize source file.
+    pos.source = this.resolveRelativePath(pos.source);
+    if (this._sourceFiles.length > 0) {
+      const sf = this._sourceFileMap[pos.source];
+      if (!sf) {
+        if (shouldIgnoreMissingRanges) {
+          return pos;
+        } else {
+          throw new Error(`Could not find original location of ${this._file.getPath()}:${line}:${col}`);
+        }
+      } else {
+        return sf.findOriginal(pos.line, pos.column, shouldIgnoreMissingRanges);
+      }
+    } else {
+      return pos;
+    }
   }
 
   /**
-   * Merges all parents into this source map.
+   * Merges all parents into a new source map.
    */
-  public merge(): void {
-    let nextMap: SourceMap = this,
-      maps: SourceMapModule.RawSourceMap[] = [];
-    while (nextMap !== null) {
-      maps.push(nextMap.getMap())
-      nextMap = nextMap.getParentMap();
-    }
-    this._map = JSON.parse(Merger.createMergedSourceMap(maps.reverse(), true));
-    // Update SourceFiles.
-    this._sourceFiles = this.getAbsoluteSourcePaths().map((sourcePath) => new SourceFile(sourcePath));
+  public merge(shouldIgnoreMissingRanges: boolean = true): void {
+    let generator = new SourceMapModule.SourceMapGenerator({
+      file: this._path
+    });
+
+    this._consumer.eachMapping((mapping) => {
+      const original = this.findOriginal(mapping.generatedLine, mapping.generatedColumn, shouldIgnoreMissingRanges);
+      // source-map uses nulled fields to indicate that it did not find a match.
+      if (original.line === null && shouldIgnoreMissingRanges) {
+        return;
+      }
+
+      generator.addMapping({
+        generated: {
+            line: mapping.generatedLine,
+            column: mapping.generatedColumn
+        },
+        original: {
+          line: original.line,
+          column: original.column
+        },
+        source: original.source,
+        name: original.name
+      });
+    });
+
+    const newMap = generator.toJSON();
+    newMap.sources = newMap.sources.map((s) => this.getRelativePath(s));
+    this._updateMap(newMap);
   }
 
   public inlineSources(): void {

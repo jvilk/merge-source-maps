@@ -22,8 +22,8 @@ const defaultOptions: ISourceMapMergerConfig = {
 function mergeFile(file: IFile, config: ISourceMapMergerConfig): void {
   const sourceFile = new SourceFile(file.src);
   if (sourceFile.getMap() !== null) {
-    const map = sourceFile.getMap();
     // Merge all of the sources together.
+    const map = sourceFile.getMap();
     map.merge();
 
     if (config.inlineSources) {
