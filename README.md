@@ -3,9 +3,7 @@
 
 If you have a multi-step compilation pipeline, you likely have a separate source map for each step
 of compilation (e.g. TypeScript => JavaScript => Minified JavaScript). Combining these source maps
-is headache inducing, and there are currently no grunt tasks to do this for you... until now!
-
-(Note: The general template and boilerplate text in this README were copied from [the README for `grunt-contrib-copy`](https://github.com/gruntjs/grunt-contrib-copy/blob/master/README.md)).
+is headache inducing, and there are currently no tools to do this for you... until now!
 
 ## Getting Started
 
