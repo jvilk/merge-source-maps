@@ -27,7 +27,7 @@
     "yargs": "^6.3.0"
   },
   "devDependencies": {
-    "@types/grunt": "^0.4.20",
+    "@types/grunt": "^0.4.21",
     "@types/node": "^6.0.46",
     "@types/source-map": "^0.1.29",
     "@types/underscore": "^1.7.33",
