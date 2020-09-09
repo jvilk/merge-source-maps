@@ -22,7 +22,7 @@ export class SourceFile {
   // The source map for this SourceFile, if any. null if it does not exist.
   private _map: SourceMap = null;
 
-  constructor(generatedFilePath: string, config: ISourceMapMergerConfig) {
+  constructor(generatedFilePath: string, private config: ISourceMapMergerConfig) {
     this._path = generatedFilePath;
     const readFile = !config.ignoreMissingSources || fs.existsSync(generatedFilePath);
     this._source = readFile ? fs.readFileSync(generatedFilePath).toString() : '';
@@ -61,7 +61,7 @@ export class SourceFile {
       mapPath = path.resolve(path.dirname(this._path), url);
       mapContents = fs.readFileSync(mapPath).toString();
     }
-    return new SourceMap(this, JSON.parse(mapContents), mapPath);
+    return new SourceMap(this, JSON.parse(mapContents), mapPath, this.config);
   }
 
   public getPath(): string { return this._path; }
@@ -116,7 +116,7 @@ export class SourceMap {
   private _sourceFileMap: {[p: string]: SourceFile};
   private _consumer: SourceMapModule.SourceMapConsumer;
 
-  constructor(file: SourceFile, map: SourceMapModule.RawSourceMap, mapPath: string) {
+  constructor(file: SourceFile, map: SourceMapModule.RawSourceMap, mapPath: string, private config: ISourceMapMergerConfig) {
     this._file = file;
     this._path = mapPath;
     this._updateMap(map);
@@ -127,7 +127,7 @@ export class SourceMap {
     this._consumer = new SourceMapModule.SourceMapConsumer(map);
     this._sourceFileMap = {};
     this._sourceFiles = this.getAbsoluteSourcePaths().map((sourcePath) => {
-      const m = new SourceFile(sourcePath);
+      const m = new SourceFile(sourcePath, this.config);
       // Map relative path to sourcefile.
       this._sourceFileMap[sourcePath] = m;
       return m;
