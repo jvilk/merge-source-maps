@@ -6,6 +6,7 @@ export interface ISourceMapMergerConfig {
   inlineSources?: boolean;
   inlineSourceMap?: boolean;
   ignoreMissingSourceMaps?: boolean;
+  ignoreMissingSources?: boolean;
 }
 
 export interface IFile {
@@ -16,11 +17,12 @@ export interface IFile {
 const defaultOptions: ISourceMapMergerConfig = {
   inlineSources: false,
   inlineSourceMap: false,
-  ignoreMissingSourceMaps: false
+  ignoreMissingSourceMaps: false,
+  ignoreMissingSources: false
 };
 
 function mergeFile(file: IFile, config: ISourceMapMergerConfig): void {
-  const sourceFile = new SourceFile(file.src);
+  const sourceFile = new SourceFile(file.src, config);
   if (sourceFile.getMap() !== null) {
     // Merge all of the sources together.
     const map = sourceFile.getMap();

@@ -1,8 +1,10 @@
 import fs = require('fs');
 import path = require('path');
 import SourceMapModule = require("source-map");
+import {ISourceMapMergerConfig} from './index';
 const mappingUrlPrefix = "# sourceMappingURL=";
 const dataURLPrefix = "data:application/json;base64,";
+const fileProtocolPrefix = "file:/";
 
 /**
  * Represents a source file.
@@ -14,15 +16,18 @@ export class SourceFile {
   private _source: string;
   // The index at which the mapping URL starts. -1 if the file lacks a source map.
   private _urlStart: number;
+  // The closing comment tag for the source map URL comment, if any (used for CSS).
+  private _urlSuffix = '';
 
   // The source map for this SourceFile, if any. null if it does not exist.
   private _map: SourceMap = null;
 
-  constructor(generatedFilePath: string) {
+  constructor(generatedFilePath: string, config: ISourceMapMergerConfig) {
     this._path = generatedFilePath;
-    this._source = fs.readFileSync(generatedFilePath).toString();
+    const readFile = !config.ignoreMissingSources || fs.existsSync(generatedFilePath);
+    this._source = readFile ? fs.readFileSync(generatedFilePath).toString() : '';
 
-    let prefixIndex = this._source.indexOf(mappingUrlPrefix);
+    let prefixIndex = this._source.lastIndexOf(mappingUrlPrefix);
     if (prefixIndex === -1) {
       // No source map.
       this._urlStart = -1;
@@ -30,6 +35,11 @@ export class SourceFile {
       this._urlStart = prefixIndex + mappingUrlPrefix.length;
 
       let url = this._source.slice(this._urlStart).trim();
+      if (url.slice(-3) === ' */') {
+          url = url.slice(0, -2).trim();
+          this._urlSuffix = ' */';
+      }
+
       switch (url[0]) {
         case '"':
         case "'":
@@ -59,7 +69,7 @@ export class SourceFile {
   public getSource(): string { return this._source; }
 
   public setMappingURL(url: string): void {
-    this._source = `${this._source.slice(0, this._urlStart)}${url}`;
+    this._source = `${this._source.slice(0, this._urlStart)}${url}${this._urlSuffix}`;
     this._map = this.getMapFromUrl(url);
   }
 
@@ -124,6 +134,23 @@ export class SourceMap {
     });
   }
 
+  /**
+   * The reference Sass implementation, dart-sass, outputs file:// absolute
+   * URLs in its source maps in many cases. This method makes those into
+   * relative URLs like we expect everywhere else. For discussion, see
+   * https://github.com/sindresorhus/grunt-sass/issues/299#issuecomment-688802356
+   */
+  public fixSassSources(sourcePath: string): string {
+    const fileProtocolStart = sourcePath.indexOf(fileProtocolPrefix);
+    if (fileProtocolStart !== -1) {
+      sourcePath = sourcePath
+        .slice(fileProtocolStart + fileProtocolPrefix.length)
+        .replace(path.dirname(this._path), '')
+        .replace(/^\/*/, sourcePath[0] === '/' ? '/' : '');
+    }
+    return sourcePath;
+  }
+
   public getFile(): SourceFile {
     return this._file;
   }
@@ -137,7 +164,7 @@ export class SourceMap {
    */
   public getAbsoluteSourcePaths(): string[] {
     return this._map.sources.map(
-      (source) => path.resolve(this.getAbsoluteSourceRoot(), source)
+      (source) => path.resolve(this.getAbsoluteSourceRoot(), this.fixSassSources(source))
     );
   }
 
@@ -149,7 +176,7 @@ export class SourceMap {
   }
 
   public getRelativePath(p: string): string {
-    return path.relative(path.dirname(this._path), p);
+    return path.relative(path.dirname(this._path), this.fixSassSources(p));
   }
 
   /**
