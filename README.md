@@ -80,6 +80,14 @@ Default: `false`
 
 If `true`, ignores input files that are missing source maps. Otherwise, `merge-source-maps` will treat this event as a fatal error.
 
+### ignoreMissingSources (--ignore-missing-sources)
+
+Type: `Boolean`
+
+Default: `false`
+
+If `true`, ignores missing input files referenced by source maps. Otherwise, `merge-source-maps` will treat this event as a fatal error.
+
 ## Usage Examples
 
 Below, we illustrate various useful configurations.
