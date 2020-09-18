@@ -32,6 +32,6 @@
     "@types/source-map": "^0.1.29",
     "@types/underscore": "^1.7.33",
     "@types/yargs": "^6.3.0",
-    "typescript": "^2.0.7"
+    "typescript": "^3"
   }
 }

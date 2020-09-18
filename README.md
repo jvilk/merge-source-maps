@@ -36,7 +36,7 @@ Task targets, files and options may be specified according to the grunt [Configu
 
 #### Source Files
 
-The source files for this task should be a JavaScript source file that contains or references an external source map.
+The source files for this task should be a JavaScript or CSS source file that contains or references an external source map.
 The source file should be from the *final* step in the compilation process.
 `merge-source-maps` will follow the chain of source maps to the beginning.
 
@@ -69,7 +69,8 @@ Type: `Boolean`
 
 Default: `false`
 
-If `true`, inlines the source map into the generated JavaScript. The `dest` file for each `src` file *must* be the path to the generated JavaScript.
+If `true`, inlines the source map into the generated JavaScript or CSS file.
+The `dest` file for each `src` file *must* be the path to the generated JavaScript/CSS.
 
 ### ignoreMissingSourceMaps (--ignore-missing-source-maps)
 
@@ -79,14 +80,22 @@ Default: `false`
 
 If `true`, ignores input files that are missing source maps. Otherwise, `merge-source-maps` will treat this event as a fatal error.
 
+### ignoreMissingSources (--ignore-missing-sources)
+
+Type: `Boolean`
+
+Default: `false`
+
+If `true`, ignores missing input files referenced by source maps. Otherwise, `merge-source-maps` will treat this event as a fatal error.
+
 ## Usage Examples
 
 Below, we illustrate various useful configurations.
 
 ### Inlined source maps and sources
 
-With this setup, the source map *and* the source code of your project will be embedded directly into the generated JavaScript file.
-Thus, the JavaScript file alone is all that is needed to debug your program with source maps, provided the debugger supports
+With this setup, the source map *and* the source code of your project will be embedded directly into the generated JavaScript or CSS file.
+Thus, the JavaScript or CSS file alone is all that is needed to debug your program with source maps, provided the debugger supports
 embedded source maps.
 Perfect for scenarios where bandwidth is not an issue, such as Node projects or debug builds.
 
@@ -116,9 +125,9 @@ merge-source-maps --inline-source-map --inline-sources build/*.js
 
 ### External source maps with inlined sources
 
-With this setup, the generated JavaScript file will have a corresponding `.map` file that also contains the source code to the program.
-The debugger will only need the JavaScript file and the map file to debug the code with source maps.
-Perfect for production web projects, where you want small, minified JavaScript files but also want to be able to debug the original source code.
+With this setup, the generated JavaScript or CSS file will have a corresponding `.map` file that also contains the source code to the program.
+The debugger will only need the JavaScript or CSS file and the map file to debug the code with source maps.
+Perfect for production web projects, where you want small, minified files but also want to be able to debug the original source code.
 
 Grunt configuration:
 
@@ -145,8 +154,8 @@ merge-source-maps --inline-sources build/*.js
 
 ### External source maps with external sources
 
-With this setup, the generated JavaScript file will have a corresponding `.map` file that references external source code files.
-The debugger will need to fetch the JavaScript file, the `.map` file, and each external source code file before you can debug
+With this setup, the generated JavaScript/CSS file will have a corresponding `.map` file that references external source code files.
+The debugger will need to fetch the JavaScript/CSS file, the `.map` file, and each external source code file before you can debug
 the code with source maps.
 Ideal if you are already planning on hosting the original source files for some reason, as it minimizes redundant information
 embedded within the source map.
@@ -181,9 +190,6 @@ Feel free to send PRs or open issues if `merge-source-maps` is not meeting your 
 
 * **You must not overwrite any of the files produced from previous compilation steps.**
 `merge-source-maps` needs the complete chain of compilation steps to appropriately produce a merged source map.
-* **Currently limited to JavaScript files only.**
-Supporting CSS would be trivial, as the source maps are the same, but the syntax for embedding them is slightly different.
-Open an issue if this is a desired feature, and provide sample files if you can. :)
 * **Your source files and source maps must contain correct paths to external resources on disk (source files and source maps).**
 `merge-source-maps` requires these to be set properly so it can follow the compilation chain back to the original source files.
 * **Your source maps must not use the sections property in the source map.**
