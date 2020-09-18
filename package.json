@@ -1,6 +1,6 @@
 {
   "name": "merge-source-maps",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Library, command-line tool, and Grunt task for merging multiple source maps from compilation phases into a single source map.",
   "repository": {
     "type": "git",

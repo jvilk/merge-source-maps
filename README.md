@@ -1,4 +1,4 @@
-# merge-source-maps v0.5.0
+# merge-source-maps v0.6.0
 > Library, command-line tool, and Grunt task for merging multiple source maps from compilation phases into a single source map.
 
 If you have a multi-step compilation pipeline, you likely have a separate source map for each step
