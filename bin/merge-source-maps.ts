@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import yargs = require('yargs');
+import yargs = require('yargs/yargs')(process.argv.slice(2));
 import mergeSourceMaps = require('../lib/index');
 import ISourceMapMergerConfig = mergeSourceMaps.ISourceMapMergerConfig;
 
